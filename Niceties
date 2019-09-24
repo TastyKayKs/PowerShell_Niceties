@@ -1,0 +1,6 @@
+#Always know you're script location regardless of version
+If(!$PSScriptRoot)
+{
+    $PSScriptRoot = (Split-Path -Parent $MyInvocation.MyCommand.Defenition)
+}
+

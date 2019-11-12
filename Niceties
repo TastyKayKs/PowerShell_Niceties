@@ -4,3 +4,5 @@ If(!$PSScriptRoot)
     $PSScriptRoot = (Split-Path -Parent $MyInvocation.MyCommand.Defenition)
 }
 
+#The shortest and fastest way I know of to add a procname to the end of a netstat in powershell
+$X=@{};PS|%{$X[$_.Id]=$_.Name};Netstat -ano|Select -Skip 4|%{"$_ "+$X.[Int]$_.Substring(71)}

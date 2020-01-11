@@ -1,3 +1,8 @@
+#Test a TCP port's connnection status
+    [System.Net.Sockets.TCPClient]::New('127.0.0.1',1234).Connected
+    -or for PowerShell v2.0-
+    (New-Object System.Net.Sockets.TCPClient -ArgumentList ('127.0.0.1',1234)).Connected
+
 #Always know your script location regardless of version
     If(!$PSScriptRoot){$PSScriptRoot = (Split-Path -Parent $MyInvocation.MyCommand.Defenition)}
 

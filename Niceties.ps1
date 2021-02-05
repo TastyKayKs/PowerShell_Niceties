@@ -39,6 +39,7 @@
     $MainBlock.Invoke($Macro)
 
 # Find the opinter for any variable in memory, not particularly useful for normal PowerShell, but interesting nonetheless
+# This is from here https://stackoverflow.com/questions/4994277/memory-address-of-an-object-in-c-sharp
     Add-Type -TypeDefinition '
     using System;
     using System.Runtime.InteropServices;

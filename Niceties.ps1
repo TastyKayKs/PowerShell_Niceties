@@ -1,7 +1,7 @@
 #Test a TCP port's connnection status
     [System.Net.Sockets.TCPClient]::New('127.0.0.1',1234).Connected
-    -or for PowerShell v2.0-
-    (New-Object System.Net.Sockets.TCPClient -ArgumentList ('127.0.0.1',1234)).Connected
+#    -or for PowerShell v2.0-
+    ([System.Activator]::CreateInstance([System.Net.Sockets.TcpClient],@('127.0.0.1',1234))).Connected
 
 #Always know your script location regardless of version
     If(!$PSScriptRoot){$PSScriptRoot = (Split-Path -Parent $MyInvocation.MyCommand.Defenition)}
@@ -37,3 +37,62 @@
     $MainBlock = [ScriptBlock]::Create($MainBlock)
 
     $MainBlock.Invoke($Macro)
+
+# Find the opinter for any variable in memory, not particularly useful for normal PowerShell, but interesting nonetheless
+    Add-Type -TypeDefinition '
+    using System;
+    using System.Runtime.InteropServices;
+
+    namespace Pointers{
+        public static class AddressHelper
+        {
+            private static object mutualObject;
+            private static ObjectReinterpreter reinterpreter;
+
+            static AddressHelper()
+            {
+                AddressHelper.mutualObject = new object();
+                AddressHelper.reinterpreter = new ObjectReinterpreter();
+                AddressHelper.reinterpreter.AsObject = new ObjectWrapper();
+            }
+
+            public static IntPtr GetAddress(object obj)
+            {
+                lock (AddressHelper.mutualObject)
+                {
+                    AddressHelper.reinterpreter.AsObject.Object = obj;
+                    IntPtr address = AddressHelper.reinterpreter.AsIntPtr.Value;
+                    AddressHelper.reinterpreter.AsObject.Object = null;
+                    return address;
+                }
+            }
+
+            public static T GetInstance<T>(IntPtr address)
+            {
+                lock (AddressHelper.mutualObject)
+                {
+                    AddressHelper.reinterpreter.AsIntPtr.Value = address;
+                    return (T)AddressHelper.reinterpreter.AsObject.Object;
+                }
+            }
+
+            // I bet you thought C# was type-safe.
+            [StructLayout(LayoutKind.Explicit)]
+            private struct ObjectReinterpreter
+            {
+                [FieldOffset(0)] public ObjectWrapper AsObject;
+                [FieldOffset(0)] public IntPtrWrapper AsIntPtr;
+            }
+
+            private class ObjectWrapper
+            {
+                public object Object;
+            }
+
+            private class IntPtrWrapper
+            {
+                public IntPtr Value;
+            }
+        }
+    }
+    '

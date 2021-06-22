@@ -36,9 +36,9 @@
     }
     $MainBlock = [ScriptBlock]::Create($MainBlock)
 
-    $MainBlock.Invoke($Macro)
+    $MainBlock.Invoke()
 
-# Find the opinter for any variable in memory, not particularly useful for normal PowerShell, but interesting nonetheless
+# Find the pointer for any variable in memory, not particularly useful for normal PowerShell, but interesting nonetheless
 # This is from here https://stackoverflow.com/questions/4994277/memory-address-of-an-object-in-c-sharp
     Add-Type -TypeDefinition '
     using System;

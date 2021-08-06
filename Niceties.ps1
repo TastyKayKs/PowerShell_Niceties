@@ -97,3 +97,16 @@
         }
     }
     '
+
+
+# This one is super ugly, but you can convert a csv to ExpandoObject[]
+$Arr = [System.Dynamic.ExpandoObject[]](
+    (Import-Csv .\FILE.csv) | %{$Count = 0}{
+        Set-Variable -Name ("tmp"+$Count) -Value ([System.Dynamic.ExpandoObject]::new())
+        $_.PSObject.Properties | %{
+            (Get-Variable ("tmp"+$Count) -ValueOnly).$($_.Name) = $_.Value
+        }
+        Get-Variable ("tmp"+$Count) -ValueOnly
+        $Count++
+    }
+)
